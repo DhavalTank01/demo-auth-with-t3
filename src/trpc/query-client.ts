@@ -1,7 +1,10 @@
 import {
   defaultShouldDehydrateQuery,
+  MutationCache,
+  QueryCache,
   QueryClient,
 } from "@tanstack/react-query";
+import { signOut } from "next-auth/react";
 import SuperJSON from "superjson";
 
 export const createQueryClient = () =>
@@ -22,4 +25,22 @@ export const createQueryClient = () =>
         deserializeData: SuperJSON.deserialize,
       },
     },
+    mutationCache: new MutationCache({
+      onError: (err: unknown) => {
+        if (
+          (err as { data?: { code?: string } })?.data?.code === "UNAUTHORIZED"
+        ) {
+          void signOut({ redirectTo: "/login?error=SessionExpired" });
+        }
+      },
+    }),
+    queryCache: new QueryCache({
+      onError: (err: unknown) => {
+        if (
+          (err as { data?: { code?: string } })?.data?.code === "UNAUTHORIZED"
+        ) {
+          void signOut({ redirectTo: "/login?error=SessionExpired" });
+        }
+      },
+    }),
   });

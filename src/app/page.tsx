@@ -56,7 +56,9 @@ export default async function Home() {
                 <form
                   action={async () => {
                     "use server";
-                    await import("@/server/auth").then((mod) => mod.signOut());
+                    await import("@/server/auth").then((mod) =>
+                      mod.signOut({ redirectTo: "/" }),
+                    );
                   }}
                 >
                   <button
