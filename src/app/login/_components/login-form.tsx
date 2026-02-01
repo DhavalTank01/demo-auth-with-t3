@@ -1,23 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
 
 export function LoginForm() {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const { showToast } = useToast();
-
-    useEffect(() => {
-        if (searchParams.get("error") === "SessionExpired") {
-            showToast("Your session has expired. Please log in again.", "error");
-            // Clean up the URL
-            router.replace("/login");
-        }
-    }, [searchParams, showToast, router]);
 
     const loginMutation = api.auth.login.useMutation();
 

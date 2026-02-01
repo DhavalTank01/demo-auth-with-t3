@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { ClientSessionProvider } from "@/app/_components/client-session-provider";
+import { GlobalToastHandler } from "@/app/_components/global-toast-handler";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body>
         <ClientSessionProvider>
           <TRPCReactProvider>
+            <GlobalToastHandler />
             {children}
             <Toaster />
           </TRPCReactProvider>

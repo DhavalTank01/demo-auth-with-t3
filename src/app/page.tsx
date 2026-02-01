@@ -57,7 +57,7 @@ export default async function Home() {
                   action={async () => {
                     "use server";
                     await import("@/server/auth").then((mod) =>
-                      mod.signOut({ redirectTo: "/" }),
+                      mod.signOut({ redirectTo: "/?message=SignedOut" }),
                     );
                   }}
                 >
