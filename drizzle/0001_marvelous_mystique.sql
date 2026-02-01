@@ -1,0 +1,1 @@
+ALTER TABLE "demo-app_user" ADD COLUMN "is_verified" boolean DEFAULT false;

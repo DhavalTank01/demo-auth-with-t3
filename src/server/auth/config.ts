@@ -2,6 +2,8 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Nodemailer from "next-auth/providers/nodemailer";
 import Resend from "next-auth/providers/resend";
+import Credentials from "next-auth/providers/credentials";
+import { eq } from "drizzle-orm";
 import { env } from "@/env";
 
 import { db } from "@/server/db";
@@ -98,6 +100,67 @@ export const authConfig = {
           }
         },
       }),
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+        otp: { label: "OTP", type: "text" },
+      },
+      authorize: async (credentials) => {
+        if (!credentials?.email) return null;
+
+        const email = credentials.email as string;
+        const user = await db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.email, email),
+        });
+
+        if (!user) return null;
+
+        // 1. Password Login
+        if (credentials.password) {
+          if (!user.password) return null; // User has no password set
+          const { compare } = await import("bcryptjs");
+          const isValid = await compare(credentials.password as string, user.password);
+
+          if (!isValid) return null;
+
+          if (!user.isVerified) {
+            throw new Error("EmailNotVerified");
+          }
+
+          return { id: user.id, email: user.email, name: user.name };
+        }
+
+        // 2. OTP Login
+        if (credentials.otp) {
+          if (!user.otp || !user.otpExpires) return null;
+
+          // Check if email is verified
+          if (!user.isVerified) {
+            throw new Error("EmailNotVerified");
+          }
+
+          // Check expiry
+          if (new Date() > user.otpExpires) {
+            throw new Error("OTPExpired");
+          }
+
+          // Check secret (assuming plain text for now as per schema implementation, ideally hashed)
+          // For simple demo, we'll verify it directly.
+          if (credentials.otp !== user.otp) {
+            return null;
+          }
+
+          // Clear OTP after successful use
+          await db.update(users).set({ otp: null, otpExpires: null, isVerified: true }).where(eq(users.id, user.id));
+
+          return { id: user.id, email: user.email, name: user.name };
+        }
+
+        return null;
+      },
+    }),
   ],
   adapter: DrizzleAdapter(db, {
     usersTable: users,
@@ -105,14 +168,32 @@ export const authConfig = {
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    session: ({ session, user }) => ({
+    jwt: ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: token.sub ?? (token.id as string),
       },
     }),
+  },
+  events: {
+    signIn: async ({ user, account }) => {
+      if (account?.provider === "nodemailer" || account?.provider === "resend") {
+        if (user.email) {
+          await db.update(users).set({ isVerified: true }).where(eq(users.email, user.email));
+        }
+      }
+    },
   },
   pages: {
     signIn: "/login",

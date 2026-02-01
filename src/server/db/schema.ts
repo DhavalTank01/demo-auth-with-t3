@@ -48,6 +48,10 @@ export const users = createTable("user", (d) => ({
     })
     .$defaultFn(() => /* @__PURE__ */ new Date()),
   image: d.varchar({ length: 255 }),
+  password: d.varchar({ length: 255 }),
+  otp: d.varchar({ length: 255 }),
+  otpExpires: d.timestamp({ mode: "date", withTimezone: true }),
+  isVerified: d.boolean("is_verified").default(false),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({

@@ -21,12 +21,13 @@ export function SignupForm() {
         const formData = new FormData(e.currentTarget);
         const email = formData.get("email") as string;
         const name = formData.get("name") as string;
+        const password = formData.get("password") as string;
 
         try {
             // 1. Create user & Send Email (Handled on server)
-            await signupMutation.mutateAsync({ email, name });
+            await signupMutation.mutateAsync({ email, name, password });
 
-            showToast("Account created! Check your email.", "success");
+            showToast("Account created! Check your email for verification.", "success");
             // 2. Manual Redirect with Email param
             router.push(`/check-email?email=${encodeURIComponent(email)}`);
         } catch (e: unknown) {
@@ -76,6 +77,19 @@ export function SignupForm() {
                         name="email"
                         id="email"
                         placeholder="you@example.com"
+                        required
+                        className="rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)]"
+                    />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="password" className="text-sm font-medium text-white">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        placeholder="••••••••"
                         required
                         className="rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)]"
                     />
