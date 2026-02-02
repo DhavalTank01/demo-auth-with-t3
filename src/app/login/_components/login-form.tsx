@@ -6,6 +6,8 @@ import { api } from "@/trpc/react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type LoginMode = "magic-link" | "otp" | "password";
 
@@ -196,16 +198,17 @@ export function LoginForm() {
             {/* Tabs */}
             <div className="mb-6 flex rounded-lg bg-black/20 p-1">
                 {(["magic-link", "otp", "password"] as const).map((m) => (
-                    <button
+                    <Button
                         key={m}
                         onClick={() => { setMode(m); setOtpSent(false); }}
-                        className={`flex-1 rounded-md py-2 text-sm font-medium transition-all ${mode === m
+                        variant="ghost"
+                        className={`flex-1 ${mode === m
                             ? "bg-white/20 text-white shadow-sm"
-                            : "text-white/60 hover:text-white"
+                            : "text-white/60 hover:text-black"
                             }`}
                     >
                         {m === "magic-link" ? "Magic Link" : m === "otp" ? "OTP" : "Password"}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
@@ -214,7 +217,7 @@ export function LoginForm() {
                 <form onSubmit={handleMagicLinkLogin} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-white">Email Address</label>
-                        <input
+                        <Input
                             type="email"
                             name="email"
                             placeholder="you@example.com"
@@ -222,13 +225,14 @@ export function LoginForm() {
                             className="rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)]"
                         />
                     </div>
-                    <button
+                    <Button
                         type="submit"
                         disabled={loginMutation.isPending}
                         className="mt-2 rounded-full bg-white/10 px-10 py-3 font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
+                        loading={loginMutation.isPending}
                     >
                         {loginMutation.isPending ? "Sending..." : "Send Magic Link"}
-                    </button>
+                    </Button>
                 </form>
             )}
 
@@ -236,7 +240,7 @@ export function LoginForm() {
                 <form onSubmit={handlePasswordLogin} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-white">Email Address</label>
-                        <input
+                        <Input
                             type="email"
                             name="email"
                             placeholder="you@example.com"
@@ -246,7 +250,7 @@ export function LoginForm() {
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-white">Password</label>
-                        <input
+                        <Input
                             type="password"
                             name="password"
                             placeholder="••••••••"
@@ -254,13 +258,14 @@ export function LoginForm() {
                             className="rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)]"
                         />
                     </div>
-                    <button
+                    <Button
                         type="submit"
                         disabled={isLoading}
                         className="mt-2 rounded-full bg-white/10 px-10 py-3 font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
+                        loading={isLoading}
                     >
                         {isLoading ? "Signing in..." : "Sign in"}
-                    </button>
+                    </Button>
                 </form>
             )}
 
@@ -269,7 +274,7 @@ export function LoginForm() {
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-white">Email Address</label>
                         <div className="flex gap-2">
-                            <input
+                            <Input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -279,14 +284,15 @@ export function LoginForm() {
                                 className="w-full rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)] disabled:opacity-50"
                             />
                             {!otpSent && (
-                                <button
+                                <Button
                                     type="button"
                                     onClick={handleSendOtp}
                                     disabled={sendOtpMutation.isPending}
                                     className="whitespace-nowrap rounded-lg bg-white/10 px-4 py-2 font-medium text-white hover:bg-white/20 disabled:opacity-50"
+                                    loading={sendOtpMutation.isPending}
                                 >
-                                    {sendOtpMutation.isPending ? "..." : "Send OTP"}
-                                </button>
+                                    {sendOtpMutation.isPending ? "Sending..." : "Send OTP"}
+                                </Button>
                             )}
                         </div>
                     </div>
@@ -295,7 +301,7 @@ export function LoginForm() {
                         <>
                             <div className="flex flex-col gap-2">
                                 <label className="text-sm font-medium text-white">Enter OTP</label>
-                                <input
+                                <Input
                                     type="text"
                                     name="otp"
                                     placeholder="123456"
@@ -303,13 +309,14 @@ export function LoginForm() {
                                     className="rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)]"
                                 />
                             </div>
-                            <button
+                            <Button
                                 type="submit"
                                 disabled={isLoading}
                                 className="mt-2 rounded-full bg-white/10 px-10 py-3 font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
+                                loading={isLoading}
                             >
                                 {isLoading ? "Verifying..." : "Validate OTP & Login"}
-                            </button>
+                            </Button>
                             <button
                                 type="button"
                                 onClick={() => setOtpSent(false)}

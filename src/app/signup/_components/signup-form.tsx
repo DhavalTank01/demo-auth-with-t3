@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function SignupForm() {
     const router = useRouter();
@@ -59,7 +61,7 @@ export function SignupForm() {
                     <label htmlFor="name" className="text-sm font-medium text-white">
                         Full Name
                     </label>
-                    <input
+                    <Input
                         type="text"
                         name="name"
                         id="name"
@@ -72,7 +74,7 @@ export function SignupForm() {
                     <label htmlFor="email" className="text-sm font-medium text-white">
                         Email Address
                     </label>
-                    <input
+                    <Input
                         type="email"
                         name="email"
                         id="email"
@@ -85,7 +87,7 @@ export function SignupForm() {
                     <label htmlFor="password" className="text-sm font-medium text-white">
                         Password
                     </label>
-                    <input
+                    <Input
                         type="password"
                         name="password"
                         id="password"
@@ -94,13 +96,14 @@ export function SignupForm() {
                         className="rounded-lg bg-black/20 px-4 py-3 text-white placeholder-white/40 outline-none ring-2 ring-transparent transition focus:ring-[hsl(280,100%,70%)]"
                     />
                 </div>
-                <button
+                <Button
                     type="submit"
                     disabled={isLoading || signupMutation.isPending}
                     className="mt-2 rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20 hover:text-[hsl(280,100%,70%)] disabled:opacity-50"
+                    loading={isLoading || signupMutation.isPending}
                 >
                     {isLoading ? "Signing up..." : "Sign up with Email"}
-                </button>
+                </Button>
             </form>
 
             <div className="mt-6 flex flex-col gap-2 text-center text-sm text-white/60">

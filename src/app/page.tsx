@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LatestPost } from "@/app/_components/post";
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
+import { Button } from "@/components/ui/button";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
@@ -61,20 +62,20 @@ export default async function Home() {
                     );
                   }}
                 >
-                  <button
+                  <Button
                     type="submit"
                     className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
                   >
                     Sign out
-                  </button>
+                  </Button>
                 </form>
               ) : (
-                <Link
-                  href="/api/auth/signin"
+                <Button
+                  asChild
                   className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
                 >
-                  Sign in
-                </Link>
+                  <Link href="/api/auth/signin">Sign in</Link>
+                </Button>
               )}
             </div>
           </div>
